@@ -34,10 +34,10 @@ Gradus::Gradus(QWidget *parent) :
     ui->statusBar->showMessage("Таймер запущен.");
     this->timerexpired();
     mayclose = false; 
-    myfont = settings->value("settings/font","MS Shell Dlg 2").toString();
+    myfont = settings->value("settings/font","Arial Narrow").toString();
     trayLength = settings->value("settings/traylength","3").toInt();
     fontsize = settings->value("settings/fontsize",ui->fontsizespinBox_2->value()).toInt();
-    isbold = settings->value("settings/isbold","0").toBool();
+    isbold = settings->value("settings/isbold","1").toBool();
     HTMLbefore = settings->value("settings/HTMLbefore","<div class=\"current-weather__thermometer current-weather__thermometer_type_now\">").toString();
     HTMLafter = settings->value("settings/HTMLafter","°C</div>").toString();
     ui->textEditBefore->setPlainText(HTMLbefore);
