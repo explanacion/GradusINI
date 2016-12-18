@@ -11,14 +11,14 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>TrayIconInformer v1.2 (Неклюдов Константин &lt;odexed@mail.ru&gt;)</string>
+   <string>TrayIconInformer v1.3 (Неклюдов Константин &lt;odexed@mail.ru&gt;)</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>210</y>
+      <y>200</y>
       <width>721</width>
       <height>31</height>
      </rect>
@@ -47,7 +47,7 @@
      <item>
       <widget class="QSpinBox" name="spinBox">
        <property name="minimum">
-        <number>10</number>
+        <number>1</number>
        </property>
        <property name="maximum">
         <number>1000</number>
@@ -104,6 +104,9 @@
      </item>
      <item>
       <widget class="QLineEdit" name="lineEdit">
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="text">
         <string>https://yandex.ru/pogoda/krasnoyarsk </string>
        </property>
@@ -115,7 +118,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>40</y>
+      <y>230</y>
       <width>351</width>
       <height>22</height>
      </rect>
@@ -151,7 +154,7 @@
      <item>
       <widget class="QSpinBox" name="fontsizespinBox_2">
        <property name="minimum">
-        <number>8</number>
+        <number>1</number>
        </property>
        <property name="maximum">
         <number>72</number>
@@ -167,7 +170,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>70</y>
+      <y>50</y>
       <width>421</width>
       <height>21</height>
      </rect>
@@ -178,10 +181,16 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>100</y>
+      <y>80</y>
       <width>721</width>
       <height>51</height>
      </rect>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="tabChangesFocus">
+     <bool>false</bool>
     </property>
     <property name="html">
      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -198,7 +207,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>150</y>
+      <y>130</y>
       <width>721</width>
       <height>29</height>
      </rect>
@@ -211,10 +220,16 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>180</y>
+      <y>160</y>
       <width>721</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="tabChangesFocus">
+     <bool>false</bool>
     </property>
     <property name="html">
      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -231,8 +246,8 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>70</y>
-      <width>721</width>
+      <y>50</y>
+      <width>361</width>
       <height>19</height>
      </rect>
     </property>
@@ -262,6 +277,16 @@ p, li { white-space: pre-wrap; }
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>lineEdit</tabstop>
+  <tabstop>textEditBefore</tabstop>
+  <tabstop>textEditAfter</tabstop>
+  <tabstop>spinBox</tabstop>
+  <tabstop>lineEditOutput</tabstop>
+  <tabstop>fontsizespinBox_2</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>pushButton_2</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

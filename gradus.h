@@ -22,6 +22,7 @@
 #include <QSslConfiguration>
 #include <QCloseEvent>
 #include <QEventLoop>
+#include <QFontDatabase>
 
 namespace Ui {
 class Gradus;

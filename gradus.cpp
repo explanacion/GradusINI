@@ -42,15 +42,15 @@ Gradus::Gradus(QWidget *parent) :
     ui->textEditAfter->setPlainText(HTMLafter);
 
     connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(trayIconActivated(QSystemTrayIcon::ActivationReason)));
-
+    ui->lineEditOutput->setText(myfont);
     ui->spinBox->setDisabled(true);
     ui->lineEdit->setDisabled(true);
     ui->textEditBefore->setDisabled(true);
     ui->textEditAfter->setDisabled(true);
     ui->label_3->setDisabled(true);
-    ui->lineEdit->setDisabled(true);
+    ui->lineEditOutput->setDisabled(true);
     ui->fontsizespinBox_2->setDisabled(true);
-
+    ui->fontsizespinBox_2->setValue(fontsize);
 }
 
 void Gradus::showAlarmIcon()
@@ -88,7 +88,8 @@ void Gradus::showTrayTemperature(QString value)
     font.setStyleStrategy(QFont::NoAntialias);
     font.setPointSize(fontsize);
     painter.setFont(font);
-    painter.drawText(pixmap.rect(),Qt::AlignCenter,tmpvalue);
+    painter.drawText(pixmap.rect(),Qt::AlignLeft | Qt::AlignVCenter,tmpvalue);
+
 
     trayIcon->setIcon(pixmap);
     trayIcon->setContextMenu(trayIconMenu);
@@ -152,6 +153,18 @@ Gradus::~Gradus()
 
 void Gradus::on_pushButton_clicked()
 {
+    // check font
+    QFontDatabase fd;
+    if (!fd.hasFamily(ui->lineEditOutput->text().trimmed()))
+    {
+        ui->statusBar->showMessage("Указанный в настройках шрифт не найден. Вместо него будет использован один из стандартных");
+        ui->lineEditOutput->setStyleSheet("color: red;");
+    }
+    else {
+        ui->statusBar->showMessage("Шрифт найден");
+        ui->lineEditOutput->setStyleSheet("color: gray;");
+    }
+
     ui->pushButton_2->setEnabled(true);
     ui->statusBar->clearMessage();
     if (timer->isActive())
@@ -186,6 +199,7 @@ void Gradus::on_pushButton_clicked()
     ui->label_3->setDisabled(true);
     ui->lineEditOutput->setDisabled(true);
     ui->lineEdit->setDisabled(true);
+    ui->fontsizespinBox_2->setDisabled(true);
 }
 
 float CeltoFahr(float cels)
@@ -209,6 +223,7 @@ void Gradus::replyFinished(QNetworkReply *reply) {
     if (reply->error() == QNetworkReply::NoError or reply->error() == QNetworkReply::UnknownNetworkError)
     {
         QString statuscode = QString::number(reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt());
+        ui->statusBar->showMessage("HTTP ответ - " + statuscode + " " + reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString());
         if (statuscode == "200")
         {
             if (isAlarm) {
@@ -255,7 +270,7 @@ void Gradus::replyFinished(QNetworkReply *reply) {
     }
     else {
         ui->statusBar->clearMessage();
-        
+        ui->statusBar->showMessage(reply->errorString());
         isAlarm = true;
         showAlarmIcon();
     }
@@ -337,9 +352,9 @@ void Gradus::timerexpired()
 void Gradus::on_pushButton_2_clicked()
 {
     timer->stop();
+    ui->lineEditOutput->setStyleSheet("color: black;");
     ui->statusBar->showMessage("Таймер остановлен. Программа в режиме ожидания");
     ui->spinBox->setEnabled(true);
-    ui->lineEdit->setEnabled(true);
     ui->textEditBefore->setEnabled(true);
     ui->textEditAfter->setEnabled(true);
     ui->pushButton->setEnabled(true);
@@ -347,6 +362,8 @@ void Gradus::on_pushButton_2_clicked()
     ui->label_3->setEnabled(true);
     ui->lineEditOutput->setEnabled(true);
     ui->lineEdit->setEnabled(true);
+    ui->fontsizespinBox_2->setEnabled(true);
+    ui->lineEdit->setFocus();
 }
 
 void Gradus::closeEvent(QCloseEvent *ev)
