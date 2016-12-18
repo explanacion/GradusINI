@@ -35,7 +35,9 @@ Gradus::Gradus(QWidget *parent) :
     this->timerexpired();
     mayclose = false; 
     myfont = settings->value("settings/font","MS Shell Dlg 2").toString();
+    trayLength = settings->value("settings/traylength","3").toInt();
     fontsize = settings->value("settings/fontsize",ui->fontsizespinBox_2->value()).toInt();
+    isbold = settings->value("settings/isbold","0").toBool();
     HTMLbefore = settings->value("settings/HTMLbefore","<div class=\"current-weather__thermometer current-weather__thermometer_type_now\">").toString();
     HTMLafter = settings->value("settings/HTMLafter","°C</div>").toString();
     ui->textEditBefore->setPlainText(HTMLbefore);
@@ -51,6 +53,10 @@ Gradus::Gradus(QWidget *parent) :
     ui->lineEditOutput->setDisabled(true);
     ui->fontsizespinBox_2->setDisabled(true);
     ui->fontsizespinBox_2->setValue(fontsize);
+    ui->BoldChkBox->setChecked(isbold);
+    ui->BoldChkBox->setDisabled(true);
+    ui->label_7->setDisabled(true);
+    ui->trayLengthspinBox->setDisabled(true);
 }
 
 void Gradus::showAlarmIcon()
@@ -87,8 +93,10 @@ void Gradus::showTrayTemperature(QString value)
     font.setFamily(myfont);
     font.setStyleStrategy(QFont::NoAntialias);
     font.setPointSize(fontsize);
+    if (isbold)
+        font.setWeight(QFont::Bold);
     painter.setFont(font);
-    painter.drawText(pixmap.rect(),Qt::AlignLeft | Qt::AlignVCenter,tmpvalue);
+    painter.drawText(pixmap.rect(),Qt::AlignCenter | Qt::AlignVCenter,tmpvalue);
 
 
     trayIcon->setIcon(pixmap);
@@ -177,12 +185,21 @@ void Gradus::on_pushButton_clicked()
     settings->setValue("settings/period",period);
 
     settings->setValue("settings/url",ui->lineEdit->text());
-    
+    settings->setValue("settings/traylength",QString::number(ui->trayLengthspinBox->value()));
     settings->setValue("settings/HTMLbefore",ui->textEditBefore->toPlainText().trimmed());
     settings->setValue("settings/HTMLafter",ui->textEditAfter->toPlainText().trimmed());
     settings->setValue("settings/font",ui->lineEditOutput->text());
     settings->setValue("settings/fontsize",QString::number(ui->fontsizespinBox_2->value()));
+    settings->setValue("settings/traylength",QString::number(ui->trayLengthspinBox->value()));
+    if (ui->BoldChkBox->isChecked()) {
+        settings->setValue("settings/isbold","1");
+    }
+    else {
+        settings->setValue("settings/isbold","0");
+    }
     myfont = ui->lineEditOutput->text();
+    trayLength = ui->trayLengthspinBox->value();
+    isbold = ui->BoldChkBox->isChecked();
     fontsize = ui->fontsizespinBox_2->value();
     url = ui->lineEdit->text();
     HTMLbefore = ui->textEditBefore->toPlainText().trimmed();
@@ -200,6 +217,9 @@ void Gradus::on_pushButton_clicked()
     ui->lineEditOutput->setDisabled(true);
     ui->lineEdit->setDisabled(true);
     ui->fontsizespinBox_2->setDisabled(true);
+    ui->BoldChkBox->setDisabled(true);
+    ui->label_7->setDisabled(true);
+    ui->trayLengthspinBox->setDisabled(true);
 }
 
 float CeltoFahr(float cels)
@@ -261,7 +281,7 @@ void Gradus::replyFinished(QNetworkReply *reply) {
 //                showAlarmIcon();
 //                return;
 //            }
-            showTrayTemperature(res);
+            showTrayTemperature(res.mid(0,trayLength));
 
             QDateTime date = QDateTime::currentDateTime();
             QString timestamp = date.toString("yyyy-MM-dd-hh.mm.ss");
@@ -363,7 +383,11 @@ void Gradus::on_pushButton_2_clicked()
     ui->lineEditOutput->setEnabled(true);
     ui->lineEdit->setEnabled(true);
     ui->fontsizespinBox_2->setEnabled(true);
+    ui->BoldChkBox->setEnabled(true);
+    ui->label_7->setEnabled(true);
+    ui->trayLengthspinBox->setEnabled(true);
     ui->lineEdit->setFocus();
+
 }
 
 void Gradus::closeEvent(QCloseEvent *ev)

@@ -44,6 +44,8 @@ public:
     QString myfont;
     int fontsize;
     bool mayclose;
+    bool isbold;
+    int trayLength;
     QNetworkAccessManager *manager;
     ~Gradus();
 public slots:

@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>740</width>
-    <height>340</height>
+    <height>381</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>TrayIconInformer v1.3 (Неклюдов Константин &lt;odexed@mail.ru&gt;)</string>
+   <string>TrayIconInformer v1.4 (Неклюдов Константин &lt;odexed@mail.ru&gt;)</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QWidget" name="horizontalLayoutWidget">
@@ -63,9 +63,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>250</y>
+      <y>290</y>
       <width>721</width>
-      <height>51</height>
+      <height>41</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -141,6 +141,13 @@
        </property>
        <property name="text">
         <string>MS Shell Dlg 2</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="BoldChkBox">
+       <property name="text">
+        <string>Полужирный</string>
        </property>
       </widget>
      </item>
@@ -254,6 +261,35 @@ p, li { white-space: pre-wrap; }
     <property name="text">
      <string>HTML код ДО значения параметра</string>
     </property>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_6">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>260</y>
+      <width>351</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <item>
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Сколько символов показывать в трее</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="trayLengthspinBox">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="value">
+        <number>3</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
