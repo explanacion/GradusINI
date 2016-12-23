@@ -23,8 +23,10 @@ FORMS    += gradus.ui
 RESOURCES += \
     myresources.qrc
 
-QMAKE_LFLAGS += -static -static-libgcc -static-libstdc++ -openssl
+QMAKE_LFLAGS += -static -static-libgcc -static-libstdc++ -openssl-linked
 
 LIBS += -L"C:/OpenSSL-Win64/lib" -lssleay32 -lssleay32
 INCLUDEPATH += "C:/OpenSSL-Win64/include/openssl"
+
+win32:RC_FILE += myapp.rc
 
