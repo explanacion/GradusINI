@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>TrayIconInformer v1.4 (Неклюдов Константин &lt;odexed@mail.ru&gt;)</string>
+   <string>TrayIconInformer v1.6 (Неклюдов Константин &lt;odexed@mail.ru&gt;)</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QWidget" name="horizontalLayoutWidget">
@@ -119,55 +119,22 @@
      <rect>
       <x>10</x>
       <y>230</y>
-      <width>351</width>
-      <height>22</height>
+      <width>721</width>
+      <height>25</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
-      <widget class="QLabel" name="label_3">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
+      <widget class="QPushButton" name="FontpushButton_3">
        <property name="text">
         <string>Шрифт</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEditOutput">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
+      <widget class="QCheckBox" name="AliasingcheckBox">
        <property name="text">
-        <string>Arial Narrow</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="BoldChkBox">
-       <property name="text">
-        <string>Полужирный</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_6">
-       <property name="text">
-        <string>Размер</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSpinBox" name="fontsizespinBox_2">
-       <property name="minimum">
-        <number>1</number>
-       </property>
-       <property name="maximum">
-        <number>72</number>
-       </property>
-       <property name="value">
-        <number>14</number>
+        <string>Сглаживание шрифтов</string>
        </property>
       </widget>
      </item>
@@ -267,7 +234,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>10</x>
       <y>260</y>
-      <width>351</width>
+      <width>721</width>
       <height>31</height>
      </rect>
     </property>
@@ -286,6 +253,33 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="value">
         <number>3</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="BackcolortoolButton">
+       <property name="text">
+        <string>Цвет фона</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="TextColortoolButton_2">
+       <property name="text">
+        <string>Цвет текста</string>
        </property>
       </widget>
      </item>
@@ -318,8 +312,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>textEditBefore</tabstop>
   <tabstop>textEditAfter</tabstop>
   <tabstop>spinBox</tabstop>
-  <tabstop>lineEditOutput</tabstop>
-  <tabstop>fontsizespinBox_2</tabstop>
   <tabstop>pushButton</tabstop>
   <tabstop>pushButton_2</tabstop>
  </tabstops>

@@ -22,7 +22,8 @@
 #include <QSslConfiguration>
 #include <QCloseEvent>
 #include <QEventLoop>
-#include <QFontDatabase>
+#include <QColorDialog>
+#include <QFontDialog>
 
 namespace Ui {
 class Gradus;
@@ -41,11 +42,13 @@ public:
     bool isAlarm;
     QString HTMLbefore;
     QString HTMLafter;
-    QString myfont;
-    int fontsize;
+    QFont myfont;
     bool mayclose;
-    bool isbold;
+    int fontstyle;
+    bool aliasing;
     int trayLength;
+    QColor bgcolor;
+    QColor txtcolor;
     QNetworkAccessManager *manager;
     ~Gradus();
 public slots:
@@ -72,6 +75,9 @@ private slots:
     
     void replyFinished(QNetworkReply *reply);
     void on_pushButton_2_clicked();
+    void on_BackcolortoolButton_clicked();
+    void on_TextColortoolButton_2_clicked();
+    void on_FontpushButton_3_clicked();
 };
 
 #endif 

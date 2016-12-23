@@ -1,11 +1,20 @@
 #include "gradus.h"
 #include "ui_gradus.h"
 
+bool strToBool(QString strr)
+{
+    if (strr == "1")
+        return true;
+    else
+        return false;
+}
+
 Gradus::Gradus(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Gradus)
 {
     ui->setupUi(this);
+    manager = new QNetworkAccessManager(this);
     trayIcon = new QSystemTrayIcon(this);
     isAlarm = false;
     settings = new QSettings("settings.conf",QSettings::IniFormat);
@@ -27,36 +36,43 @@ Gradus::Gradus(QWidget *parent) :
         isAlarm = true;
         ui->statusBar->showMessage("Файл настроек доступен только для чтения.");
     }
+    mayclose = false;
+    myfont.fromString(settings->value("settings/font","Arial,8,-1,5,75,0,0,0,0,0").toString());
+    trayLength = settings->value("settings/traylength","3").toInt();
+    HTMLbefore = settings->value("settings/HTMLbefore","<div class=\"current-weather__thermometer current-weather__thermometer_type_now\">").toString();
+    HTMLafter = settings->value("settings/HTMLafter","°C</div>").toString();
+    ui->textEditBefore->setPlainText(HTMLbefore);
+    ui->textEditAfter->setPlainText(HTMLafter);
+    aliasing = strToBool(settings->value("settings/aliasing","0").toString());
+
+    if (aliasing)
+    {
+        ui->AliasingcheckBox->setChecked(true);
+    }
+    bgcolor = QColor(settings->value("settings/bgcolor","#000000").toString());
+    txtcolor = QColor(settings->value("settings/textcolor","#00ff00").toString());
+
+    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(trayIconActivated(QSystemTrayIcon::ActivationReason)));
+
+    ui->spinBox->setDisabled(true);
+    ui->lineEdit->setDisabled(true);
+    ui->textEditBefore->setDisabled(true);
+    ui->textEditAfter->setDisabled(true);
+    ui->FontpushButton_3->setDisabled(true);
+    ui->label_7->setDisabled(true);
+    ui->trayLengthspinBox->setDisabled(true);
+    ui->AliasingcheckBox->setDisabled(true);
+    ui->BackcolortoolButton->setDisabled(true);
+    ui->TextColortoolButton_2->setDisabled(true);
+
+    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
+
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(timerexpired()));
     timer->setInterval(period*1000);;
     timer->start();
     ui->statusBar->showMessage("Таймер запущен.");
     this->timerexpired();
-    mayclose = false; 
-    myfont = settings->value("settings/font","Arial Narrow").toString();
-    trayLength = settings->value("settings/traylength","3").toInt();
-    fontsize = settings->value("settings/fontsize",ui->fontsizespinBox_2->value()).toInt();
-    isbold = settings->value("settings/isbold","1").toBool();
-    HTMLbefore = settings->value("settings/HTMLbefore","<div class=\"current-weather__thermometer current-weather__thermometer_type_now\">").toString();
-    HTMLafter = settings->value("settings/HTMLafter","°C</div>").toString();
-    ui->textEditBefore->setPlainText(HTMLbefore);
-    ui->textEditAfter->setPlainText(HTMLafter);
-
-    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(trayIconActivated(QSystemTrayIcon::ActivationReason)));
-    ui->lineEditOutput->setText(myfont);
-    ui->spinBox->setDisabled(true);
-    ui->lineEdit->setDisabled(true);
-    ui->textEditBefore->setDisabled(true);
-    ui->textEditAfter->setDisabled(true);
-    ui->label_3->setDisabled(true);
-    ui->lineEditOutput->setDisabled(true);
-    ui->fontsizespinBox_2->setDisabled(true);
-    ui->fontsizespinBox_2->setValue(fontsize);
-    ui->BoldChkBox->setChecked(isbold);
-    ui->BoldChkBox->setDisabled(true);
-    ui->label_7->setDisabled(true);
-    ui->trayLengthspinBox->setDisabled(true);
 }
 
 void Gradus::showAlarmIcon()
@@ -77,28 +93,21 @@ void Gradus::showTrayIcon()
 
 void Gradus::showTrayTemperature(QString value)
 {
-    QPixmap pixmap(24,24);
-    pixmap.fill(Qt::white);
+    QPixmap pixmap(16,16);
+    pixmap.fill(bgcolor);
     QPainter painter(&pixmap);
-    QString tmpvalue;
-    if (value.length() < 2) {
-        
-        tmpvalue = value;
+
+    if (!aliasing) {
+        myfont.setStyleStrategy(QFont::NoAntialias);
+        painter.setRenderHint(QPainter::TextAntialiasing, true);
     }
     else {
-        tmpvalue = value;
+        myfont.setStyleStrategy(QFont::PreferAntialias);
     }
-    QFont font=painter.font();
-    //font.setFamily("MS Shell Dlg 2");
-    font.setFamily(myfont);
-    font.setStyleStrategy(QFont::NoAntialias);
-    font.setPointSize(fontsize);
-    if (isbold)
-        font.setWeight(QFont::Bold);
-    painter.setFont(font);
-    painter.drawText(pixmap.rect(),Qt::AlignCenter | Qt::AlignVCenter,tmpvalue);
 
-
+    painter.setFont(myfont);
+    painter.setPen(txtcolor);
+    painter.drawText(pixmap.rect(),Qt::AlignCenter | Qt::AlignVCenter,value);
     trayIcon->setIcon(pixmap);
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->show();
@@ -158,21 +167,16 @@ Gradus::~Gradus()
 }
 
 
+QString boolToStr(bool inp)
+{
+    if (inp)
+        return "1";
+    else
+        return "0";
+}
 
 void Gradus::on_pushButton_clicked()
 {
-    // check font
-    QFontDatabase fd;
-    if (!fd.hasFamily(ui->lineEditOutput->text().trimmed()))
-    {
-        ui->statusBar->showMessage("Указанный в настройках шрифт не найден. Вместо него будет использован один из стандартных");
-        ui->lineEditOutput->setStyleSheet("color: red;");
-    }
-    else {
-        ui->statusBar->showMessage("Шрифт найден");
-        ui->lineEditOutput->setStyleSheet("color: gray;");
-    }
-
     ui->pushButton_2->setEnabled(true);
     ui->statusBar->clearMessage();
     if (timer->isActive())
@@ -186,21 +190,17 @@ void Gradus::on_pushButton_clicked()
 
     settings->setValue("settings/url",ui->lineEdit->text());
     settings->setValue("settings/traylength",QString::number(ui->trayLengthspinBox->value()));
+
+    settings->setValue("settings/aliasing",boolToStr(ui->AliasingcheckBox->isChecked()));
+    settings->setValue("settings/bgcolor",bgcolor.name(QColor::HexRgb));
+    settings->setValue("settings/textcolor",txtcolor.name(QColor::HexRgb));
     settings->setValue("settings/HTMLbefore",ui->textEditBefore->toPlainText().trimmed());
     settings->setValue("settings/HTMLafter",ui->textEditAfter->toPlainText().trimmed());
-    settings->setValue("settings/font",ui->lineEditOutput->text());
-    settings->setValue("settings/fontsize",QString::number(ui->fontsizespinBox_2->value()));
+    settings->setValue("settings/font",myfont.toString());
     settings->setValue("settings/traylength",QString::number(ui->trayLengthspinBox->value()));
-    if (ui->BoldChkBox->isChecked()) {
-        settings->setValue("settings/isbold","1");
-    }
-    else {
-        settings->setValue("settings/isbold","0");
-    }
-    myfont = ui->lineEditOutput->text();
+
     trayLength = ui->trayLengthspinBox->value();
-    isbold = ui->BoldChkBox->isChecked();
-    fontsize = ui->fontsizespinBox_2->value();
+    aliasing = ui->AliasingcheckBox->isChecked();
     url = ui->lineEdit->text();
     HTMLbefore = ui->textEditBefore->toPlainText().trimmed();
     HTMLafter = ui->textEditAfter->toPlainText().trimmed();
@@ -213,13 +213,14 @@ void Gradus::on_pushButton_clicked()
     ui->lineEdit->setDisabled(true);
     ui->textEditBefore->setDisabled(true);
     ui->textEditAfter->setDisabled(true);
-    ui->label_3->setDisabled(true);
-    ui->lineEditOutput->setDisabled(true);
+    ui->FontpushButton_3->setDisabled(true);
     ui->lineEdit->setDisabled(true);
-    ui->fontsizespinBox_2->setDisabled(true);
-    ui->BoldChkBox->setDisabled(true);
+    ui->FontpushButton_3->setDisabled(true);
     ui->label_7->setDisabled(true);
     ui->trayLengthspinBox->setDisabled(true);
+    ui->AliasingcheckBox->setDisabled(true);
+    ui->BackcolortoolButton->setDisabled(true);
+    ui->TextColortoolButton_2->setDisabled(true);
 }
 
 float CeltoFahr(float cels)
@@ -274,13 +275,6 @@ void Gradus::replyFinished(QNetworkReply *reply) {
             }
             QString res = temp.mid(0,pos2);
             res=res.trimmed();
-//            if (res.length() > 3)
-//            {
-//                ui->statusBar->showMessage("Длина выводимого сообщения превышает 3 символа.");
-//                isAlarm = true;
-//                showAlarmIcon();
-//                return;
-//            }
             showTrayTemperature(res.mid(0,trayLength));
 
             QDateTime date = QDateTime::currentDateTime();
@@ -333,8 +327,6 @@ bool isConnectedToNetwork()
 
 
 void Gradus::readdata(QUrl url) {
-    manager = new QNetworkAccessManager(this);
-    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
     if (!isConnectedToNetwork())
     {
         this->showAlarmIcon();
@@ -372,20 +364,19 @@ void Gradus::timerexpired()
 void Gradus::on_pushButton_2_clicked()
 {
     timer->stop();
-    ui->lineEditOutput->setStyleSheet("color: black;");
     ui->statusBar->showMessage("Таймер остановлен. Программа в режиме ожидания");
     ui->spinBox->setEnabled(true);
     ui->textEditBefore->setEnabled(true);
     ui->textEditAfter->setEnabled(true);
     ui->pushButton->setEnabled(true);
     ui->pushButton_2->setDisabled(true);
-    ui->label_3->setEnabled(true);
-    ui->lineEditOutput->setEnabled(true);
+    ui->FontpushButton_3->setEnabled(true);
     ui->lineEdit->setEnabled(true);
-    ui->fontsizespinBox_2->setEnabled(true);
-    ui->BoldChkBox->setEnabled(true);
     ui->label_7->setEnabled(true);
     ui->trayLengthspinBox->setEnabled(true);
+    ui->AliasingcheckBox->setEnabled(true);
+    ui->BackcolortoolButton->setEnabled(true);
+    ui->TextColortoolButton_2->setEnabled(true);
     ui->lineEdit->setFocus();
 
 }
@@ -405,4 +396,31 @@ void Gradus::toquit()
 {
     mayclose=true;
     this->close();
+}
+
+void Gradus::on_BackcolortoolButton_clicked()
+{
+    QColor tmpcolor = QColorDialog::getColor(bgcolor);
+    if (tmpcolor.isValid()) {
+        bgcolor = tmpcolor;
+    }
+}
+
+void Gradus::on_TextColortoolButton_2_clicked()
+{
+    QColor tmpcolor = QColorDialog::getColor(txtcolor);
+    if (tmpcolor.isValid())
+    {
+        txtcolor = tmpcolor;
+    }
+}
+
+void Gradus::on_FontpushButton_3_clicked()
+{
+    bool bOK;
+    QFont &oldfont = myfont;
+    QFontDialog fd;
+    fd.setCurrentFont(oldfont);
+    myfont = fd.getFont(&bOK,oldfont);
+
 }
