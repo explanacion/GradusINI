@@ -1,5 +1,6 @@
 #include "gradus.h"
 #include "ui_gradus.h"
+#include <QToolTip>
 
 bool strToBool(QString strr)
 {
@@ -14,6 +15,11 @@ Gradus::Gradus(QWidget *parent) :
     ui(new Ui::Gradus)
 {
     ui->setupUi(this);
+
+    trayAlarmimage = new QIcon(":/new/prefix1/icon2_error.png");
+    trayImage = new QIcon(":/new/prefix1/icon2.png");
+    whitepixmap = new QPixmap(16,16);
+
     manager = new QNetworkAccessManager(this);
     trayIcon = new QSystemTrayIcon(this);
     isAlarm = false;
@@ -73,29 +79,29 @@ Gradus::Gradus(QWidget *parent) :
     timer->start();
     ui->statusBar->showMessage("Таймер запущен.");
     this->timerexpired();
+
+    this->trayIcon->setToolTip("TrayIconInformer v1.7 " + url);
 }
 
 void Gradus::showAlarmIcon()
 {
-    QIcon trayimage(":/new/prefix1/icon2_error.png");
-    trayIcon->setIcon(trayimage);
+    trayIcon->setIcon(*trayAlarmimage);
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->show();
 }
 
 void Gradus::showTrayIcon()
 {
-    QIcon trayImage(":/new/prefix1/icon2.png");
-    trayIcon->setIcon(trayImage);
+    trayIcon->setIcon(*trayImage);
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->show();
 }
 
 void Gradus::showTrayTemperature(QString value)
-{
-    QPixmap pixmap(16,16);
-    pixmap.fill(bgcolor);
-    QPainter painter(&pixmap);
+{ 
+    whitepixmap->fill(bgcolor);
+    QPainter painter;
+    painter.begin(whitepixmap);
 
     if (!aliasing) {
         myfont.setStyleStrategy(QFont::NoAntialias);
@@ -107,8 +113,8 @@ void Gradus::showTrayTemperature(QString value)
 
     painter.setFont(myfont);
     painter.setPen(txtcolor);
-    painter.drawText(pixmap.rect(),Qt::AlignCenter | Qt::AlignVCenter,value);
-    trayIcon->setIcon(pixmap);
+    painter.drawText(whitepixmap->rect(),Qt::AlignCenter | Qt::AlignVCenter,value);
+    trayIcon->setIcon(*whitepixmap);
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->show();
 }
@@ -163,6 +169,10 @@ void Gradus::changeEvent(QEvent *event)
 Gradus::~Gradus()
 {
     trayIcon->hide();
+    delete trayAlarmimage;
+    delete trayImage;
+    delete whitepixmap;
+    delete settings;
     delete ui;
 }
 
@@ -177,6 +187,7 @@ QString boolToStr(bool inp)
 
 void Gradus::on_pushButton_clicked()
 {
+    showTrayIcon();
     ui->pushButton_2->setEnabled(true);
     ui->statusBar->clearMessage();
     if (timer->isActive())
@@ -229,6 +240,7 @@ float CeltoFahr(float cels)
 }
 
 void Gradus::replyFinished(QNetworkReply *reply) {
+    reply->deleteLater();
     if (reply->error() == QNetworkReply::HostNotFoundError) {
         ui->statusBar->showMessage("Адрес неверный. Подключение невозможно.");
         isAlarm=true;
@@ -364,6 +376,7 @@ void Gradus::timerexpired()
 void Gradus::on_pushButton_2_clicked()
 {
     timer->stop();
+    showAlarmIcon();
     ui->statusBar->showMessage("Таймер остановлен. Программа в режиме ожидания");
     ui->spinBox->setEnabled(true);
     ui->textEditBefore->setEnabled(true);

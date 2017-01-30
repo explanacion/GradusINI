@@ -58,6 +58,10 @@ public slots:
 
 private:
     void closeEvent(QCloseEvent *ev);
+    QIcon *trayAlarmimage;
+    QIcon *trayImage;
+    QPixmap *whitepixmap;
+
     QMenu *trayIconMenu;
     QAction *minimizeAction;
     QAction *restoreAction;
